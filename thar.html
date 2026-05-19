@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BeastOnRoad</title>
+ 
+<link rel="stylesheet" href="thar.css">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+ 
+</head>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --orange: #e77d20;
+    --orange-dim: rgba(231,125,32,0.15);
+    --dark: #0a0a0a;
+    --text-muted: #666;
+    --white: #fff;
+  }
+  html, body { height: 100%; background: var(--dark); font-family: 'Rajdhani', sans-serif; }
+ 
+  /* === SIGN-IN SCREEN === */
+
+/* Change font of complete form */
+#signInScreen,
+#signInScreen input,
+#signInScreen button,
+#signInScreen label,
+#signInScreen .card-title,
+#signInScreen .logo-name,
+#signInScreen .logo-tag,
+#signInScreen .field-hint {
+    font-family:Georgia, 'Times New Roman', Times, serif;
+}
+  #signInScreen {
+
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow-y:auto;
+  }
+ 
+  .bg-grid {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(231,125,32,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(231,125,32,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridPan 25s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes gridPan { 0% { background-position:0 0; } 100% { background-position:60px 60px; } }
+ 
+  .spotlight {
+    position: fixed; width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(231,125,32,0.12) 0%, transparent 65%);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    animation: pulse 4s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:.7; transform:translate(-50%,-50%) scale(1); }
+    50%      { opacity:1;  transform:translate(-50%,-50%) scale(1.08); }
+  }
+  .bg-word {
+    position: fixed; font-family: 'Anton', sans-serif;
+    font-size: clamp(120px,22vw,260px); color: rgba(231,125,32,0.035);
+    letter-spacing: .05em; user-select: none;
+    top: 50%; left: 50%; transform: translate(-50%,-50%); white-space: nowrap;
+    pointer-events:none;
+  }
+  .scanline {
+    position: fixed; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--orange) 30%, rgba(231,125,32,.6) 50%, var(--orange) 70%, transparent 100%);
+    animation: scan 3s ease-in-out infinite; opacity: .5;
+    pointer-events:none;
+  }
+  @keyframes scan { 0%{top:-2px;opacity:0;} 10%{opacity:.5;} 90%{opacity:.5;} 100%{top:100%;opacity:0;} }
+  .corner { position: fixed; width:28px; height:28px; opacity:.4; pointer-events:none; }
+  .corner-tl { top:28px;    left:28px;  border-top:1.5px solid var(--orange); border-left:1.5px solid var(--orange); }
+  .corner-tr { top:28px;    right:28px; border-top:1.5px solid var(--orange); border-right:1.5px solid var(--orange); }
+  .corner-bl { bottom:28px; left:28px;  border-bottom:1.5px solid var(--orange); border-left:1.5px solid var(--orange); }
+  .corner-br { bottom:28px; right:28px; border-bottom:1.5px solid var(--orange); border-right:1.5px solid var(--orange); }
+ 
+  /* === CARD === */
+  .card {
+    position:relative;
+    z-index:5;
+    width:100%;
+    max-width:480px;
+    padding:40px 40px;
+    border-radius:18px;
+    background:rgba(15,15,15,0.92);
+    border:1px solid rgba(231,125,32,0.35);
+    box-shadow:
+        0 0 40px rgba(231,125,32,0.18),
+        0 10px 60px rgba(0,0,0,0.8);
+    animation:slideUp .6s ease;
+    margin: auto;
+  }
+ 
+  @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, transparent 0%, var(--orange) 30%, var(--orange) 70%, transparent 100%);
+    border-radius: 4px 4px 0 0;
+  }
+  .card::after {
+    content:''; position:absolute; bottom:-1px; right:-1px;
+    width:40px; height:40px;
+    border-bottom:1px solid var(--orange); border-right:1px solid var(--orange);
+    border-radius:0 0 4px 0; opacity:.5;
+  }
+ 
+  /* === LOGO === */
+  .logo-area { text-align:center; margin-bottom:28px; }
+  .logo-icon {
+    width:52px; height:52px; border:1.5px solid var(--orange); border-radius:3px;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
+  }
+  .logo-icon svg { width:26px; height:26px; fill:var(--orange); }
+  .logo-name { font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; color:var(--white); letter-spacing:3px; }
+  .logo-name span { color:var(--orange); }
+  .logo-tag { font-size:11px; color:var(--text-muted); letter-spacing:4px; text-transform:uppercase; margin-top:5px; }
+ 
+  .card-title {
+    font-family:'Orbitron',sans-serif;
+    font-size:13px;
+    color:#aaa;
+    letter-spacing:3px;
+    text-align:center;
+    margin-bottom:26px;
+    text-transform:uppercase;
+    padding-bottom:16px;
+    border-bottom:1px solid #1e1e1e;
+  }
+  .card-title span { color: var(--orange); }
+ 
+  /* === FORM === */
+
+  /* ===== FIXED FORM LAYOUT ===== */
+
+.form-group{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    margin-bottom:22px;
+}
+
+/* LABEL */
+.form-group label{
+    width:180px;
+    min-width:180px;
+    color:var(--orange);
+    font-size:12px;
+    letter-spacing:2px;
+    line-height:1.4;
+    margin-bottom:0;
+    font-family:'Orbitron',sans-serif;
+}
+
+/* INPUT AREA */
+.form-group input,
+.form-group .phone-wrap,
+.form-group .pw-wrap{
+    flex:1;
+}
+
+/* INPUTS */
+input[type="text"],
+input[type="tel"],
+input[type="date"],
+input[type="password"]{
+    width:100%;
+}
+
+/* FIELD HINT */
+.field-hint{
+    margin-left:200px;
+    margin-top:6px;
+    font-size:10px;
+    color:#555;
+}
+
+/* PASSWORD STRENGTH */
+.strength-bar{
+    margin-left:200px;
+    margin-top:6px;
+}
+
+#strength-label{
+    margin-left:200px;
+    margin-top:5px;
+}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:700px){
+
+    .form-group{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:8px;
+    }
+
+    .form-group label{
+        width:100%;
+    }
+
+    .field-hint,
+    .strength-bar,
+    #strength-label{
+        margin-left:0;
+        width:100%;
+    }
+}
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .form-group { margin-bottom:14px; }
+  label {
+    display:block; font-family:'Orbitron',sans-serif;
+    font-size:10px; letter-spacing:2.5px; color:var(--orange); text-transform:uppercase; margin-bottom:7px;
+  }
+  input[type="text"], input[type="tel"], input[type="date"], input[type="password"] {
+    width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:3px;
+    color:var(--white); padding:11px 14px; height:46px;
+    font-family:'Rajdhani',sans-serif; font-size:15px; letter-spacing:.5px;
+    transition:border-color .2s, box-shadow .2s; outline:none;
+  }
+  input:focus { border-color:var(--orange); box-shadow:0 0 0 3px var(--orange-dim); }
+  input::placeholder { color:#3a3a3a; }
+ 
+  /* Date input styling */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.5) sepia(1) saturate(5) hue-rotate(5deg);
+    cursor:pointer;
+    opacity:0.6;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity:1;
+  }
+ 
+  .pw-wrap { position:relative; }
+  .pw-wrap input { padding-right:42px; }
+  .eye-btn {
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:16px; padding:0;
+    transition:color .2s;
+  }
+  .eye-btn:hover { color:var(--orange); }
+ 
+  /* Phone prefix */
+  .phone-wrap { display:flex; gap:0; }
+  .phone-prefix {
+    background:#0d0d0d;
+    border:1px solid #2a2a2a;
+    border-right:none;
+    border-radius:3px 0 0 3px;
+    color:var(--orange);
+    padding:11px 12px;
+    font-family:'Orbitron',sans-serif;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    white-space:nowrap;
+    height:46px;
+  }
+  .phone-wrap input {
+    border-radius:0 3px 3px 0;
+    flex:1;
+  }
+ 
+  /* Gender select */
+  select {
+    width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:3px;
+    color:var(--white); padding:11px 14px; height:46px;
+    font-family:'Rajdhani',sans-serif; font-size:15px; letter-spacing:.5px;
+    transition:border-color .2s, box-shadow .2s; outline:none;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23e77d20' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position: right 14px center;
+  }
+  select:focus { border-color:var(--orange); box-shadow:0 0 0 3px var(--orange-dim); }
+  select option { background:#111; color:#fff; }
+ 
+  /* === TERMS === */
+  .terms-row {
+    display:flex; align-items:flex-start; gap:10px; margin-bottom:16px;
+    font-size:12px; color:#666; line-height:1.5;
+  }
+  .terms-row input[type="checkbox"] {
+    width:16px; height:16px; flex-shrink:0; margin-top:2px;
+    accent-color: var(--orange); cursor:pointer;
+  }
+  .terms-row a { color:var(--orange); text-decoration:none; }
+  .terms-row a:hover { text-decoration:underline; }
+ 
+  /* === BUTTON === */
+  .btn-submit {
+    width:100%; background:var(--orange); color:#fff; border:none; border-radius:3px;
+    padding:14px; font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:3px;
+    cursor:pointer; position:relative; overflow:hidden;
+    transition:background .2s, transform .1s;
+  }
+  .btn-submit:hover { background:#d06e18; }
+  .btn-submit:active { transform:scale(.98); }
+  .btn-submit::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.15) 50%,transparent 100%);
+    transform:translateX(-100%); transition:transform .5s;
+  }
+  .btn-submit:hover::after { transform:translateX(100%); }
+ 
+  /* === MSG === */
+  .msg {
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:1px;
+    text-align:center; padding:9px 12px; border-radius:3px; margin-bottom:14px; display:none;
+  }
+  .msg.error   { background:rgba(200,40,40,.12);  border:1px solid rgba(200,40,40,.3);  color:#e06060; }
+  .msg.success { background:rgba(40,180,80,.12);  border:1px solid rgba(40,180,80,.3);  color:#60e080; }
+ 
+  /* === SPINNER === */
+  .spinner {
+    display:inline-block; width:13px; height:13px;
+    border:2px solid rgba(255,255,255,.3); border-top-color:#fff;
+    border-radius:50%; animation:spin .7s linear infinite;
+    vertical-align:middle; margin-right:6px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+ 
+  /* === SUCCESS SCREEN === */
+  .success-screen {
+    display:none;
+    text-align:center;
+    padding:20px 0;
+    animation:slideUp .5s ease;
+  }
+  .success-icon {
+    width:70px; height:70px;
+    border:2px solid var(--orange);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 20px;
+    font-size:28px;
+    background:rgba(231,125,32,0.08);
+    animation:popIn .5s cubic-bezier(.17,.89,.32,1.27) both;
+  }
+  @keyframes popIn {
+    from { transform:scale(0); opacity:0; }
+    to   { transform:scale(1); opacity:1; }
+  }
+  .success-screen h2 {
+    font-family:'Anton',sans-serif;
+    font-size:32px;
+    color:#fff;
+    letter-spacing:2px;
+    margin-bottom:8px;
+  }
+  .success-screen h2 span { color:var(--orange); }
+  .success-screen p {
+    color:#666;
+    font-size:13px;
+    letter-spacing:1.5px;
+    margin-bottom:6px;
+  }
+  .welcome-name {
+    color:var(--orange) !important;
+    font-family:'Orbitron',sans-serif !important;
+    font-size:15px !important;
+    margin-bottom:24px !important;
+  }
+  .btn-enter {
+    background:var(--orange); color:#fff; border:none; border-radius:3px;
+    padding:13px 32px; font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:3px;
+    cursor:pointer; transition:background .2s;
+  }
+  .btn-enter:hover { background:#d06e18; }
+ 
+  /* Divider */
+  .divider {
+    display:flex; align-items:center; gap:12px;
+    margin:16px 0;
+    color:#2a2a2a;
+    font-size:11px;
+    letter-spacing:2px;
+  }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px; background:#1e1e1e;
+  }
+ 
+  /* === TOAST === */
+  .toast {
+    position:fixed; bottom:32px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--orange); color:#fff;
+    padding:10px 24px; border-radius:3px;
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:2px;
+    z-index:9999; opacity:0; pointer-events:none;
+    transition:opacity .3s, transform .3s; white-space:nowrap;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+ 
+  /* === MAIN SITE === */
+  #mainSite { display:none; }
+  #mainSite.visible { display:block; animation:fadeIn .6s ease both; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+ 
+  body.login-active #mainSite {
+    filter: blur(8px);
+    pointer-events:none;
+    user-select:none;
+  }
+ 
+  /* Field hint text */
+  .field-hint {
+    font-size:10px;
+    color:#444;
+    margin-top:5px;
+    letter-spacing:.5px;
+  }
+ 
+  /* Strength bar */
+  .strength-bar {
+    height:3px;
+    border-radius:2px;
+    background:#1e1e1e;
+    margin-top:6px;
+    overflow:hidden;
+  }
+  .strength-fill {
+    height:100%;
+    border-radius:2px;
+    width:0%;
+    transition:width .3s, background .3s;
+  }
+</style>
+ 
+<body>
+ 
+<header>
+  <div class="logo">BeastOnRoad</div>
+  <nav>
+    <a href="#cars">FLEET</a>
+    <a href="#about">ABOUT</a>
+    <a href="#gallery">TERRAIN</a>
+    <a href="#reviews">REVIEWS</a>
+    <a href="mod.html" style="border: 1px solid #e77d20; padding: 5px 10px; border-radius: 4px;">MY BOOKINGS</a>
+  </nav>
+  <a class="nav-btn" href="#" onclick="openBooking()">BOOK TEST DRIVE</a>
+</header>
+ 
+<!--HERO SECTION-->
+<section class="hero">
+  <div class="hero-left">
+    <p class="tag">ULTIMATE OFF-ROAD MACHINES</p>
+    <h1>
+      <span class="white">Born For</span><br>
+      <span class="orange">The Wild</span>
+    </h1>
+    <p class="desc">
+      Conquer every terrain, summit every peak. Discover our
+      handpicked fleet of legendary off-road beasts engineered
+      for those who refuse to stay on the road.
+    </p>
+    <div class="buttons">
+      <a class="btn-main" href="#cars">EXPLORE FLEET</a>
+      <a class="btn-outline" href="#contact">BOOK TEST DRIVE</a>
+    </div>
+  </div>
+  <div class="bg-text">BEAST</div>
+  <div class="stats">
+    <div><h2>4+</h2><p>BRANDS</p></div>
+    <div><h2>18</h2><p>MODELS</p></div>
+    <div><h2>5K+</h2><p>HAPPY OWNERS</p></div>
+  </div>
+</section>
+ 
+<!-- CARS SECTION -->
+<section id="cars" class="cars-section">
+  <h2 class="section-title">Our Off-Road Beasts</h2>
+  <div class="car-container" id="carGrid">
+    <div class="car-card" onclick="showVariants('thar')" style="cursor:pointer;">
+      <div class="image-box"><img src="C:\Users\Aaryushi\OneDrive\Desktop\thar pictures\monstar.jpg" alt="Mahindra Thar"></div>
+      <h3 style="color: rgb(231,125,32);"><b>Mahindra Thar</b></h3>
+      <ul><li>150 HP</li><li>2WD/4WD</li><li>6-speed MT/AT</li><li>2.2L ENGINE</li></ul>
+      <h3 style="color: rgb(231,125,32);">STARTING AT ₹9.99L</h3>
+      <p style="font-size:12px; color:#aaa; margin-top:6px;">Click to see variants →</p>
+    </div>
+    <div class="car-card" onclick="showVariants('gurkha')" style="cursor:pointer;">
+      <div class="image-box"><img src="C:\Users\Aaryushi\OneDrive\Desktop\thar pictures\gurkha1.jpg" alt="Force Gurkha"></div>
+      <h3 style="color: rgb(231,125,32);"><b>Force Gurkha</b></h3>
+      <ul><li>140 HP</li><li>4x4 Drive</li><li>5-Manual</li><li>2.6L DIESEL</li></ul>
+      <h3 style="color: rgb(231,125,32);">STARTING AT ₹18.99L</h3>
+      <p style="font-size:12px; color:#aaa; margin-top:6px;">Click to see variants →</p>
+    </div>
+    <div class="car-card" onclick="showVariants('fortuner')" style="cursor:pointer;">
+      <div class="image-box"><img src="C:\Users\Aaryushi\OneDrive\Desktop\thar pictures\aestheticfortuner.jpg" alt="Toyota Fortuner"></div>
+      <h3 style="color: rgb(231,125,32);"><b>Toyota Fortuner</b></h3>
+      <ul><li>204 HP</li><li>4x4 Drive</li><li>6-speed AT</li><li>2.8L DIESEL</li></ul>
+      <h3 style="color: rgb(231,125,32);">STARTING AT ₹34.99L</h3>
+      <p style="font-size:12px; color:#aaa; margin-top:6px;">Click to see variants →</p>
+    </div>
+    <div class="car-card" onclick="showVariants('wrangler')" style="cursor:pointer;">
+      <div class="image-box"><img src="C:\Users\Aaryushi\OneDrive\Desktop\thar pictures\jeepwrangler.webp" alt="Jeep Wrangler"></div>
+      <h3 style="color: rgb(231,125,32);"><b>Jeep Wrangler</b></h3>
+      <ul><li>375 HP</li><li>4WD Drive</li><li>8-Auto</li><li>2.4L ENGINE</li></ul>
+      <h3 style="color: rgb(231,125,32);">STARTING AT ₹20.99L</h3>
+      <p style="font-size:12px; color:#aaa; margin-top:6px;">Click to see variants →</p>
+    </div>
+    <div class="car-card" onclick="showVariants('rubicon')" style="cursor:pointer;">
+      <div class="image-box"><img src="C:\Users\Aaryushi\OneDrive\Desktop\thar pictures\rubicon.avif" alt="Rubicon"></div>
+      <h3 style="color: rgb(231,125,32);"><b>Rubicon</b></h3>
+      <ul><li>150 HP</li><li>4WD Drive</li><li>6-speed MT</li><li>4-cylinder Petrol</li></ul>
+      <h3 style="color: rgb(231,125,32);">STARTING AT ₹20.99L</h3>
+      <p style="font-size:12px; color:#aaa; margin-top:6px;">Click to see variants →</p>
+    </div>
+  </div>
+ 
+  <!-- VARIANT VIEW -->
+  <div id="variantView" style="display:none;">
+    <button onclick="goBack()" style="background:none; border:1px solid #e77d20; color:#fff; padding:10px 20px; border-radius:6px; font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:2px; cursor:pointer; margin-bottom:2rem;">← BACK TO FLEET</button>
+    <h2 id="v-title" style="color:#e77d20; font-family:'Anton',sans-serif; font-size:32px; margin:0 0 6px;"></h2>
+    <p id="v-sub" style="color:#aaa; font-size:14px; margin:0 0 2rem;"></p>
+    <div id="variantsGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:16px;"></div>
+  </div>
+</section>
+ 
+<script>
+const variantData = {
+  thar: {
+    name: "Mahindra Thar",
+    sub: "Choose your Thar — 3-door or 5-door, petrol or diesel",
+    variants: [
+      { name: "AX (E) 3-Door Diesel", engine: "2.2L mHawk", hp: "130 HP", drive: "4WD", gearbox: "6MT", price: "₹9.99L" },
+      { name: "AX (O) 3-Door Petrol", engine: "2.0L Turbo", hp: "150 HP", drive: "4WD", gearbox: "6MT / 6AT", price: "₹12.99L", badge: "POPULAR" },
+      { name: "LX Hard Top Diesel", engine: "2.2L mHawk", hp: "150 HP", drive: "4WD", gearbox: "6MT / 6AT", price: "₹15.49L" },
+      { name: "LX 5-Door Petrol", engine: "2.0L Turbo", hp: "175 HP", drive: "4WD", gearbox: "6AT", price: "₹17.60L", badge: "NEW" }
+    ]
+  },
+  gurkha: {
+    name: "Force Gurkha",
+    sub: "Legendary 4x4 — 3-door and 5-door options",
+    variants: [
+      { name: "Gurkha 3-Door", engine: "2.6L Diesel", hp: "140 HP", drive: "4x4", gearbox: "5MT", price: "₹18.99L" },
+      { name: "Gurkha 5-Door", engine: "2.6L Diesel", hp: "140 HP", drive: "4x4", gearbox: "5MT", price: "₹22.50L", badge: "POPULAR" }
+    ]
+  },
+  fortuner: {
+    name: "Toyota Fortuner",
+    sub: "Premium SUV with serious off-road capability",
+    variants: [
+      { name: "Fortuner 4x2 AT Petrol", engine: "2.7L Petrol", hp: "166 HP", drive: "4x2", gearbox: "6AT", price: "₹34.99L" },
+      { name: "Fortuner 4x4 MT Diesel", engine: "2.8L Diesel", hp: "204 HP", drive: "4x4", gearbox: "6MT", price: "₹38.99L", badge: "POPULAR" },
+      { name: "Fortuner Legender", engine: "2.8L Diesel", hp: "204 HP", drive: "4x4", gearbox: "6AT", price: "₹44.99L", badge: "TOP" }
+    ]
+  },
+  wrangler: {
+    name: "Jeep Wrangler",
+    sub: "Iconic American off-roader, built to dominate",
+    variants: [
+      { name: "Sport 2-Door", engine: "2.0L Turbo", hp: "270 HP", drive: "4WD", gearbox: "8AT", price: "₹20.99L" },
+      { name: "Sahara 4-Door", engine: "2.0L Turbo", hp: "270 HP", drive: "4WD", gearbox: "8AT", price: "₹28.99L", badge: "POPULAR" },
+      { name: "Rubicon 4-Door", engine: "3.6L V6", hp: "285 HP", drive: "4WD", gearbox: "8AT", price: "₹35.99L", badge: "TOP" }
+    ]
+  },
+  rubicon: {
+    name: "Rubicon",
+    sub: "Extreme off-road performance, no compromises",
+    variants: [
+      { name: "Rubicon Sport", engine: "2.0L Petrol", hp: "150 HP", drive: "4WD", gearbox: "6MT", price: "₹20.99L" },
+      { name: "Rubicon X", engine: "3.6L V6", hp: "285 HP", drive: "4WD", gearbox: "8AT", price: "₹30.99L", badge: "POPULAR" }
+    ]
+  }
+};
+ 
+function showVariants(key) {
+  const car = variantData[key];
+  document.getElementById("carGrid").style.display = "none";
+  document.getElementById("variantView").style.display = "block";
+  document.getElementById("v-title").textContent = car.name;
+  document.getElementById("v-sub").textContent = car.sub;
+  document.getElementById("variantsGrid").innerHTML = car.variants.map(v => `
+    <div style="background:#1a1a1a; border:1px solid #333; border-radius:10px; padding:1.2rem; position:relative;">
+      ${v.badge ? `<span style="position:absolute; top:12px; right:12px; background:#e77d2022; color:#e77d20; font-size:10px; letter-spacing:1px; padding:3px 8px; border-radius:20px;">${v.badge}</span>` : ""}
+      <h3 style="color:#fff; font-size:15px; margin:0 0 12px; font-family:'Orbitron',sans-serif;">${v.name}</h3>
+      <table style="width:100%; font-size:13px; border-collapse:collapse;">
+        <tr><td style="color:#aaa; padding:5px 0; border-bottom:1px solid #2a2a2a;">Engine</td><td style="color:#fff; text-align:right; padding:5px 0; border-bottom:1px solid #2a2a2a;">${v.engine}</td></tr>
+        <tr><td style="color:#aaa; padding:5px 0; border-bottom:1px solid #2a2a2a;">Power</td><td style="color:#fff; text-align:right; padding:5px 0; border-bottom:1px solid #2a2a2a;">${v.hp}</td></tr>
+        <tr><td style="color:#aaa; padding:5px 0; border-bottom:1px solid #2a2a2a;">Drive</td><td style="color:#fff; text-align:right; padding:5px 0; border-bottom:1px solid #2a2a2a;">${v.drive}</td></tr>
+        <tr><td style="color:#aaa; padding:5px 0;">Gearbox</td><td style="color:#fff; text-align:right; padding:5px 0;">${v.gearbox}</td></tr>
+      </table>
+      <p style="color:#e77d20; font-size:15px; font-weight:bold; margin:12px 0 0;">${v.price}</p>
+    </div>
+  `).join("");
+}
+ 
+function goBack() {
+  document.getElementById("carGrid").style.display = "flex";
+  document.getElementById("variantView").style.display = "none";
+}
+</script>
+ 
+<!-- GALLERY -->
+<section id="gallery" class="gallery-section">
+  <h2 class="section-title">Built For Every Terrain</h2>
+  <h2 class="hello">From Himmalayan to costal dunes-our beasts are born to dominate all of it.</h2>
+  <div class="terrain-block">
+    <h2>MOUNTAINS</h2>
+    <div class="terrain-gallery">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7mcZRUMBU8_t0jgebkEohwAmFxSk1c5G-VA&s">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0VkODtXTbwq6dPkCLEays_XBAvllHGeXcFw&s">
+      <img src="https://images2.alphacoders.com/111/thumb-1920-1114405.jpg">
+      <img src="https://i.pinimg.com/736x/76/b8/f8/76b8f832a0876cfbcd727cefa2a47d10.jpg">
+    </div>
+    <p class="terrain-desc">Our cars deliver powerful performance and stability even on steep mountain roads.</p>
+  </div>
+  <div class="terrain-block">
+    <h2>RIVER</h2>
+    <div class="terrain-gallery">
+      <img src="https://wallpapers.com/images/hd/green-mahindra-thar-2021-in-river-5uravs6tnsg6wq9p.jpg">
+      <img src="https://static-cdn.team-bhp.com/prod/vehicles/mahindra/thar/thar/mahindra-thar-4-yZL2XG3s8mJ0SC7o.png?w=640&dpr=3&optimize=low&format=auto&quality=50">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ394uaXeLncPOHBwFFdcfYbtshZMxrBQh6g&s">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWuDPpx7q9z23pdt3Zyte8vtOLq-oxv0h_Ww&s">
+    </div>
+    <p class="terrain-desc">Highlights the vehicle's ability to handle tough, water-filled terrain.</p>
+  </div>
+  <div class="terrain-block">
+    <h2>❄ Snow</h2>
+    <div class="terrain-gallery">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtCj9daFKn1RcGZnUmVhJtic3oD-8eLxBFNw&s">
+      <img src="https://i.pinimg.com/564x/13/34/77/133477b0857bec2b8d3b83a1e3e29ee0.jpg">
+      <img src="https://media.tenor.com/wAhtrQwaUJ0AAAAe/fortuner4x2.png">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScTxD8NGRtzpLpxobnRI2xgsUKOQsw45GAeA&s">
+    </div>
+    <p class="terrain-desc">Advanced traction and control for safe driving in icy conditions.</p>
+  </div>
+  <div class="terrain-block">
+    <h2>🌲 Forest</h2>
+    <div class="terrain-gallery">
+      <img src="https://res.cloudinary.com/total-dealer/image/upload/v1/production/6t52svrv5xyzmb4fifoczsjmmdhe.jpg">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREn00gj8koU3yYdiNiBc8Nxm0KabdpERj0dw&s">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgyJ-fa2Upi29YF4HkbHP5-5YKUpvhUz8kSQ&s">
+      <img src="https://img.magnific.com/free-photo/off-road-car-fantasy-scenario_23-2151437503.jpg?semt=ais_hybrid&w=740&q=80">
+    </div>
+    <p class="terrain-desc">Precision handling through dense forests and narrow scenic roads.</p>
+  </div>
+</section>
+ 
+<!-- ABOUT -->
+<section id="about" class="about-section">
+  <h2 class="section-title">About Beast On Road</h2>
+  <p font-size="32">
+    Beast On Road is dedicated to real off-road lovers. We bring the most powerful 4x4 machines built to dominate mud, sand, rocks and mountains. We are passionate about off-roading and we want to share that passion with you. Our handpicked fleet of legendary off-road beasts is engineered for those who refuse to stay on the road. Whether you are a seasoned off-road enthusiast or just starting out, we have the perfect vehicles for you. We are committed to providing an unforgettable off-road experience, with expert guidance and support every step of the way. Join us and unleash the beast within you.
+  </p>
+</section>
+ 
+<!-- REVIEWS SECTION -->
+<section id="reviews" class="reviews-section">
+  <h2 class="section-title">Customer Reviews</h2>
+  <div class="add-review-box">
+    <h3>Share Your Experience</h3>
+    <input type="text" id="reviewer-name" placeholder="Your name" maxlength="40">
+    <textarea id="reviewer-text" placeholder="Write your review here..." rows="3" maxlength="250" style="resize:none;"></textarea>
+    <button onclick="submitReview()">Add Review</button>
+  </div>
+  <div class="reviews" id="reviews-container"></div>
+</section>
+ 
+<script>
+function loadReviews() {
+  let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+  reviews.forEach(r => showReviewCard(r.name, r.text));
+}
+function showReviewCard(name, text) {
+  const card = document.createElement("div");
+  card.className = "review-card";
+  card.dataset.name = name;
+  card.dataset.text = text;
+  card.innerHTML = `<span class="delete-btn">&times;</span><p>"${text}"</p><h4>- ${name}</h4>`;
+  document.getElementById("reviews-container").appendChild(card);
+}
+document.getElementById("reviews-container").addEventListener("click", function(e) {
+  if (e.target.classList.contains("delete-btn")) {
+    const card = e.target.closest(".review-card");
+    const name = card.dataset.name;
+    const text = card.dataset.text;
+    let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+    reviews = reviews.filter(r => !(r.name === name && r.text === text));
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+    card.style.opacity = "0";
+    card.style.transform = "scale(0.9)";
+    setTimeout(() => card.remove(), 300);
+  }
+});
+function submitReview() {
+  const name = document.getElementById("reviewer-name").value.trim();
+  const text = document.getElementById("reviewer-text").value.trim();
+  if (!name || !text) { alert("Please enter your name and review."); return; }
+  let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+  reviews.push({ name, text });
+  localStorage.setItem("reviews", JSON.stringify(reviews));
+  showReviewCard(name, text);
+  document.getElementById("reviewer-name").value = "";
+  document.getElementById("reviewer-text").value = "";
+}
+loadReviews();
+</script>
+ 
+<footer>
+  <p>© 2026 Beast On Road | Designed for Adventure</p>
+</footer>
+ 
+<!-- ========== BOOKING MODAL ========== -->
+<div id="bookingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#1a1a1a; border:1px solid #e77d20; border-radius:12px; padding:2rem; width:90%; max-width:520px; max-height:90vh; overflow-y:auto; position:relative;">
+    <button onclick="closeBooking()" style="position:absolute; top:14px; right:16px; background:none; border:none; color:#aaa; font-size:20px; cursor:pointer;">✕</button>
+    <p style="color:#e77d20; font-size:11px; letter-spacing:3px; margin:0 0 6px;">FEEL THE POWER</p>
+    <h2 style="font-family:'Anton',sans-serif; font-size:28px; margin:0 0 20px; color:#fff;">Book A <span style="color:#e77d20;">Test Drive</span></h2>
+    <form id="modalForm">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+        <div>
+          <label style="font-size:10px; color:#e77d20; letter-spacing:2px; display:block; margin-bottom:5px;">FIRST NAME</label>
+          <input type="text" id="m-fname" placeholder="First name" required style="width:100%; background:#111; border:1px solid #333; border-radius:6px; color:#fff; padding:10px; font-size:13px; box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:10px; color:#e77d20; letter-spacing:2px; display:block; margin-bottom:5px;">LAST NAME</label>
+          <input type="text" id="m-lname" placeholder="Last name" required style="width:100%; background:#111; border:1px solid #333; border-radius:6px; color:#fff; padding:10px; font-size:13px; box-sizing:border-box;">
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:10px; color:#e77d20; letter-spacing:2px; display:block; margin-bottom:5px;">PHONE NUMBER</label>
+        <input type="tel" id="m-number" placeholder="10-digit number" pattern="[0-9]{10}" required style="width:100%; background:#111; border:1px solid #333; border-radius:6px; color:#fff; padding:10px; font-size:13px; box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:10px; color:#e77d20; letter-spacing:2px; display:block; margin-bottom:5px;">INTERESTED IN</label>
+        <select id="m-model" required style="width:100%; background:#111; border:1px solid #333; border-radius:6px; color:#fff; padding:10px; font-size:13px; box-sizing:border-box;">
+          <option value="">-- SELECT A VEHICLE --</option>
+          <option value="thar">Mahindra Thar</option>
+          <option value="fortuner">Toyota Fortuner</option>
+          <option value="gurkha">Force Gurkha</option>
+          <option value="jeep">Jeep Wrangler</option>
+          <option value="rubicon">Rubicon</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:10px; color:#e77d20; letter-spacing:2px; display:block; margin-bottom:5px;">PREFERRED DATE</label>
+        <input type="date" id="m-date" style="width:100%; background:#111; border:1px solid #333; border-radius:6px; color:#fff; padding:10px; font-size:13px; box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:10px; color:#e77d20; letter-spacing:2px; display:block; margin-bottom:5px;">CITY / LOCATION</label>
+        <input type="text" id="m-city" placeholder="Enter your city" style="width:100%; background:#111; border:1px solid #333; border-radius:6px; color:#fff; padding:10px; font-size:13px; box-sizing:border-box;">
+      </div>
+      <button type="submit" style="width:100%; background:#e77d20; color:#fff; border:none; padding:13px; border-radius:6px; font-family:'Orbitron',sans-serif; font-size:13px; letter-spacing:2px; cursor:pointer;">SUBMIT BOOKING</button>
+    </form>
+    <div id="modalSuccess" style="display:none; text-align:center; padding:1.5rem 0;">
+      <div style="font-size:40px; margin-bottom:12px;">🎉</div>
+      <h3 style="color:#e77d20; font-family:'Anton',sans-serif; font-size:28px; margin:0 0 8px;">Booking Confirmed!</h3>
+      <p style="color:#aaa; font-size:13px;">We'll call you within 2 hours.</p>
+      <button onclick="closeBooking()" style="margin-top:16px; background:none; border:1px solid #e77d20; color:#fff; padding:10px 24px; border-radius:6px; font-family:'Orbitron',sans-serif; font-size:12px; cursor:pointer;">CLOSE</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+  function openBooking() {
+    document.getElementById("bookingModal").style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+  function closeBooking() {
+    document.getElementById("bookingModal").style.display = "none";
+    document.getElementById("modalForm").reset();
+    document.body.style.overflow = "auto";
+    document.getElementById("modalForm").style.display = "block";
+    document.getElementById("modalSuccess").style.display = "none";
+  }
+  document.getElementById("bookingModal").onclick = function(e) {
+    if (e.target === this) closeBooking();
+  }
+  document.getElementById("modalForm").onsubmit = function(e) {
+    e.preventDefault();
+    const model = document.getElementById("m-model").value;
+    if (!model) { alert("Please select a vehicle."); return; }
+    const booking = {
+      name: document.getElementById("m-fname").value + " " + document.getElementById("m-lname").value,
+      car: model,
+      city: document.getElementById("m-city").value,
+      date: document.getElementById("m-date").value,
+      time: new Date().toLocaleString()
+    };
+    const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    bookings.push(booking);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+    document.getElementById("modalForm").style.display = "none";
+    document.getElementById("modalSuccess").style.display = "block";
+  };
+</script>
+ 
+<!-- ===== CREATE ACCOUNT SCREEN ===== -->
+<div id="signInScreen">
+  <div class="bg-grid"></div>
+  <div class="spotlight"></div>
+  <div class="bg-word">BEAST</div>
+  <div class="scanline"></div>
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+ 
+  <div class="card">
+ 
+    <!-- LOGO -->
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/></svg>
+      </div>
+      <div class="logo-name">Beast<span>On</span>Road</div>
+      <div class="logo-tag">Dominate Every Terrain</div>
+    </div>
+ 
+    <!-- REGISTRATION FORM -->
+    <div id="registerForm">
+      <div class="card-title">CREATE YOUR <span>ACCOUNT</span></div>
+ 
+      <div class="msg" id="reg-msg"></div>
+ 
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="r-fullname">FULL NAME</label>
+        <input type="text" id="r-fullname" placeholder="Enter your full name" autocomplete="name">
+      </div>
+ 
+      <!-- Phone Number -->
+      <div class="form-group">
+        <label for="r-phone">PHONE NUMBER</label>
+        <div class="phone-wrap">
+          <div class="phone-prefix">🇮🇳 +91</div>
+          <input type="tel" id="r-phone" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}">
+        </div>
+        <p class="field-hint">Enter your 10-digit Indian mobile number</p>
+      </div>
+ 
+      <!-- Date of Birth -->
+      <div class="form-group">
+        <label for="r-dob">DATE OF BIRTH</label>
+        <input type="date" id="r-dob" max="">
+        <p class="field-hint">You must be at least 18 years old to register</p>
+      </div>
+ 
+      <!-- Password -->
+      <div class="form-group">
+        <label for="r-pass">CREATE PASSWORD</label>
+        <div class="pw-wrap">
+          <input type="password" id="r-pass" placeholder="Minimum 6 characters" oninput="checkStrength(this.value)">
+          <button class="eye-btn" type="button" onclick="togglePwReg('r-pass', this)">👁</button>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        <p class="field-hint" id="strength-label">Enter a password</p>
+      </div>
+ 
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="r-confirm">CONFIRM PASSWORD</label>
+        <div class="pw-wrap">
+          <input type="password" id="r-confirm" placeholder="Re-enter your password">
+          <button class="eye-btn" type="button" onclick="togglePwReg('r-confirm', this)">👁</button>
+        </div>
+      </div>
+ 
+      <!-- Terms -->
+      <div class="terms-row">
+        <input type="checkbox" id="r-terms">
+        <label for="r-terms" style="font-size:12px; color:#666; letter-spacing:.5px; text-transform:none; font-family:'Rajdhani',sans-serif; cursor:pointer;">
+          I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a> of BeastOnRoad
+        </label>
+      </div>
+ 
+      <button class="btn-submit" onclick="doCreateAccount()" id="btn-create">
+        CREATE ACCOUNT
+      </button>
+    </div>
+ 
+    <!-- SUCCESS SCREEN (shown after account created) -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">⚡</div>
+      <h2>YOU'RE <span>IN!</span></h2>
+      <p>Account created successfully</p>
+      <p class="welcome-name" id="welcome-name-display"></p>
+      <p style="color:#444; font-size:11px; letter-spacing:1.5px; margin-bottom:24px;">GET READY TO DOMINATE THE TERRAIN</p>
+      <button class="btn-enter" onclick="enterSite()">ENTER THE BEAST &rarr;</button>
+    </div>
+ 
+  </div>
+</div>
+ 
+<!-- ===== MAIN SITE ===== -->
+<div id="mainSite">
+  <div style="min-height:100vh;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:'Orbitron',sans-serif;">
+    <div style="font-family:'Anton',sans-serif;font-size:clamp(40px,8vw,80px);color:#fff;letter-spacing:4px;">
+      BEAST<span style="color:#e77d20;">ON</span>ROAD
+    </div>
+    <p style="color:#e77d20;letter-spacing:4px;font-size:12px;" id="welcome-rider">WELCOME, RIDER ✓</p>
+    <p style="color:#333;font-size:10px;letter-spacing:2px;text-align:center;max-width:300px;line-height:2.2;">
+      PASTE YOUR WEBSITE CONTENT<br>INSIDE THE #mainSite DIV
+    </p>
+    <button onclick="doLogout()" style="margin-top:12px;background:none;border:1px solid #e77d20;color:#fff;padding:10px 28px;border-radius:3px;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;cursor:pointer;">SIGN OUT</button>
+  </div>
+</div>
+ 
+<div class="toast" id="toast"></div>
+ 
+<script>
+  const SESSION_KEY = "bor_session";
+  const USER_KEY    = "bor_user";
+ 
+  document.body.classList.add("login-active");
+ 
+  // Set max DOB to today
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("r-dob").setAttribute("max", today);
+ 
+  // Auto-login if session already exists
+  window.addEventListener("DOMContentLoaded", () => {
+    const session = localStorage.getItem(SESSION_KEY);
+    const user    = JSON.parse(localStorage.getItem(USER_KEY) || "{}");
+    if (session) showSite(false, user.fullName || "RIDER");
+  });
+ 
+  // Toggle password visibility
+  function togglePwReg(fieldId, btn) {
+    const inp = document.getElementById(fieldId);
+    inp.type = inp.type === "password" ? "text" : "password";
+    btn.textContent = inp.type === "password" ? "👁" : "🙈";
+  }
+ 
+  // Password strength checker
+  function checkStrength(val) {
+    const fill  = document.getElementById("strength-fill");
+    const label = document.getElementById("strength-label");
+    if (!val) { fill.style.width = "0%"; label.textContent = "Enter a password"; return; }
+ 
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+ 
+    const levels = [
+      { pct:"20%", color:"#e74c3c", text:"Very Weak" },
+      { pct:"40%", color:"#e67e22", text:"Weak" },
+      { pct:"60%", color:"#f1c40f", text:"Fair" },
+      { pct:"80%", color:"#2ecc71", text:"Strong" },
+      { pct:"100%",color:"#27ae60", text:"Very Strong" },
+    ];
+    const lvl = levels[Math.min(score - 1, 4)] || levels[0];
+    fill.style.width = lvl.pct;
+    fill.style.background = lvl.color;
+    label.textContent = lvl.text;
+    label.style.color = lvl.color;
+  }
+ 
+  // Show error/success message
+  function showMsg(text, type) {
+    const el = document.getElementById("reg-msg");
+    el.className = "msg " + type;
+    el.textContent = text;
+    el.style.display = "block";
+    setTimeout(() => { el.style.display = "none"; }, 4000);
+  }
+ 
+  // Toast
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
+ 
+  // Age validation helper
+  function getAge(dobStr) {
+    const dob   = new Date(dobStr);
+    const now   = new Date();
+    let age     = now.getFullYear() - dob.getFullYear();
+    const m     = now.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+    return age;
+  }
+ 
+  // CREATE ACCOUNT
+  function doCreateAccount() {
+    const fullName = document.getElementById("r-fullname").value.trim();
+    const phone    = document.getElementById("r-phone").value.trim();
+    const dob      = document.getElementById("r-dob").value;
+    const pass     = document.getElementById("r-pass").value;
+    const confirm  = document.getElementById("r-confirm").value;
+    const terms    = document.getElementById("r-terms").checked;
+ 
+    // Validations
+    if (!fullName)                          { showMsg("⚠ Please enter your full name", "error"); return; }
+    if (fullName.split(" ").length < 2)     { showMsg("⚠ Please enter both first and last name", "error"); return; }
+    if (!/^[0-9]{10}$/.test(phone))         { showMsg("⚠ Enter a valid 10-digit phone number", "error"); return; }
+    if (!dob)                               { showMsg("⚠ Please enter your date of birth", "error"); return; }
+    if (getAge(dob) < 18)                   { showMsg("⚠ You must be at least 18 years old", "error"); return; }
+    if (pass.length < 6)                    { showMsg("⚠ Password must be at least 6 characters", "error"); return; }
+    if (pass !== confirm)                   { showMsg("⚠ Passwords do not match", "error"); return; }
+    if (!terms)                             { showMsg("⚠ Please accept the Terms & Conditions", "error"); return; }
+ 
+    // Show spinner
+    const btn = document.getElementById("btn-create");
+    btn.innerHTML = '<span class="spinner"></span> CREATING...';
+    btn.disabled = true;
+ 
+    setTimeout(() => {
+      btn.innerHTML = "CREATE ACCOUNT";
+      btn.disabled = false;
+ 
+      // Save user data
+      const userData = {
+        fullName : fullName,
+        phone    : phone,
+        dob      : dob,
+        createdAt: new Date().toLocaleString()
+      };
+      localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      localStorage.setItem(SESSION_KEY, "1");
+ 
+      // Show success screen inside card
+      document.getElementById("registerForm").style.display = "none";
+      document.getElementById("successScreen").style.display = "block";
+      document.getElementById("welcome-name-display").textContent =
+        "WELCOME, " + fullName.split(" ")[0].toUpperCase() + "!";
+ 
+    }, 900);
+  }
+ 
+  // Enter site after success screen
+  function enterSite() {
+    const user = JSON.parse(localStorage.getItem(USER_KEY) || "{}");
+    showSite(true, user.fullName || "RIDER");
+  }
+ 
+  // Show main site
+  function showSite(animate, name) {
+    document.body.classList.remove("login-active");
+    document.getElementById("signInScreen").style.display = "none";
+    document.getElementById("mainSite").classList.add("visible");
+    if (animate) {
+      const firstName = (name || "RIDER").split(" ")[0].toUpperCase();
+      showToast("⚡ WELCOME, " + firstName + "!");
+      const wr = document.getElementById("welcome-rider");
+      if (wr) wr.textContent = "WELCOME, " + firstName + " ✓";
+    }
+  }
+ 
+  // Logout
+  function doLogout() {
+    localStorage.removeItem(SESSION_KEY);
+    // Reset form state
+    document.getElementById("registerForm").style.display = "block";
+    document.getElementById("successScreen").style.display = "none";
+    document.getElementById("r-fullname").value = "";
+    document.getElementById("r-phone").value = "";
+    document.getElementById("r-dob").value = "";
+    document.getElementById("r-pass").value = "";
+    document.getElementById("r-confirm").value = "";
+    document.getElementById("r-terms").checked = false;
+    document.getElementById("reg-msg").style.display = "none";
+    document.getElementById("strength-fill").style.width = "0%";
+    document.getElementById("strength-label").textContent = "Enter a password";
+ 
+    document.body.classList.add("login-active");
+    document.getElementById("mainSite").classList.remove("visible");
+    document.getElementById("signInScreen").style.display = "flex";
+    showToast("SIGNED OUT");
+  }
+</script>
+ 
+</body>
+</html>
