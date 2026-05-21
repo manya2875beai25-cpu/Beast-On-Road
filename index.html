@@ -474,6 +474,33 @@ input[type="password"]{
       <a class="btn-main" href="#cars">EXPLORE FLEET</a>
       <a class="btn-outline" href="#contact">BOOK TEST DRIVE</a>
     </div>
+
+   <script>
+const quotes = [
+"Conquer roads. Create stories.",
+"The road ends where adventure begins.",
+"Drive beyond limits.",
+"Every trail tells a story.",
+"Born to roam.",
+"Fuel your wild side.",
+"Adventure starts with ignition.",
+"No maps. Just memories.",
+"Own the road ahead.",
+"Turn journeys into legends."
+];
+
+function loadHeroQuote(){
+const el=document.getElementById("ai-quote-line");
+
+const random=
+quotes[Math.floor(Math.random()*quotes.length)];
+
+el.textContent="⚡ "+random;
+}
+
+loadHeroQuote();
+</script>
+   
   </div>
   <div class="bg-text">BEAST</div>
   <div class="stats">
